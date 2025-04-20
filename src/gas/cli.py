@@ -18,7 +18,7 @@ def cli():
 
 
 @cli.command()
-@click.option("--detailed", default=False, help="Show detailed explanation")
+@click.option("--detailed", "-d", default=False, help="Show detailed explanation")
 def explain(detailed):
     """Explain Git diff changes in plain English.
 
