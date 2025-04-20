@@ -78,6 +78,12 @@ def _build_commit_prompt(
     - If needed, add a detailed description after a blank line
     - Be specific about what changed and why
     - Focus on the intention of the change, not just what files changed
+    - Do not include headers or other formatting symbols like *, #, ```, etc.
+
+    Follow the format:
+    Commit message short summary
+
+    Detailed description of the changes. Can be empty or multiple paragraphs.
     """
 
     if commit_type:

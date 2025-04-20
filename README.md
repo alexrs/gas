@@ -2,6 +2,8 @@
 
 A command-line tool that brings AI-powered assistance to your Git workflow.
 
+**Note:** This project is just a demo of how to use Cohere models with Hugging Face Inference Providers. For more information, check out [the docs.](https://huggingface.co/docs/inference-providers/en/providers/cohere)
+
 ## Features
 
 - **Explain Changes** (`git diff | gas explain`): Get an AI-powered explanation of your Git changes in plain English
@@ -13,7 +15,7 @@ A command-line tool that brings AI-powered assistance to your Git workflow.
 
 2. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/gas.git
+git clone https://github.com/alexrs/gas.git
 cd gas
 ```
 
