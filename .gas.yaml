@@ -1,0 +1,7 @@
+ai:
+  max_tokens: 1500
+  model: CohereLabs/c4ai-command-a-03-2025
+  temperature: 0.3
+user:
+  emoji_enabled: true
+  language: en
