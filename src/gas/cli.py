@@ -18,17 +18,23 @@ def cli():
 
 
 @cli.command()
-@click.argument("diff_input", type=click.File("r"), default=sys.stdin)
 @click.option("--detailed", default=False, help="Show detailed explanation")
-def explain(diff_input, detailed):
+def explain(detailed):
     """Explain Git diff changes in plain English.
 
-    Read from stdin if no file is provided:
+    By default, explains the current working directory changes.
+    Can also read from stdin if piped:
     $ git diff | gas explain
     """
     from gas.commands.explain import explain_diff
 
-    diff_content = diff_input.read()
+    # Check if we're receiving input from a pipe
+    if not sys.stdin.isatty():
+        diff_content = sys.stdin.read()
+    else:
+        # No pipe, use get_git_diff
+        diff_content = get_git_diff()
+
     explain_diff(diff_content, detailed=detailed)
 
 

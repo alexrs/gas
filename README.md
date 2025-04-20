@@ -82,6 +82,9 @@ user:
 ### Explain Changes
 
 ```bash
+# Explan current diff
+gas explain
+
 # Explain staged changes
 git diff --staged | gas explain
 

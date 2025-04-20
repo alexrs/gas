@@ -41,7 +41,7 @@ def generate_commit_message(commit_type: Optional[str] = None, edit: bool = True
             # Save message to temporary file and open editor
             message = _edit_message(message)
 
-        if Confirm.ask("\n[bold]Do you want to commit with this message?[/bold]"):
+        if Confirm.ask("\n[bold]Do you want to commit?[/bold]"):
             with Status("[bold blue]📝 Committing changes...", spinner="dots") as status:
                 _commit_changes(message)
                 status.update("[bold green]✅ Changes committed successfully!")
