@@ -12,6 +12,7 @@ from gas.core.config import config
 
 console = Console()
 
+
 def generate_commit_message(commit_type: Optional[str] = None, edit: bool = True) -> None:
     """Generate a commit message based on staged changes.
 
@@ -37,9 +38,8 @@ def generate_commit_message(commit_type: Optional[str] = None, edit: bool = True
         console.print(message)
 
         if edit:
-            with Status("[bold blue]📝 Opening editor...", spinner="dots"):
-                # Save message to temporary file and open editor
-                message = _edit_message(message)
+            # Save message to temporary file and open editor
+            message = _edit_message(message)
 
         if Confirm.ask("\n[bold]Do you want to commit with this message?[/bold]"):
             with Status("[bold blue]📝 Committing changes...", spinner="dots") as status:
@@ -49,9 +49,10 @@ def generate_commit_message(commit_type: Optional[str] = None, edit: bool = True
     except Exception as e:
         console.print(f"[red]❌ Error generating commit message: {str(e)}[/red]")
 
+
 def _generate_message(changes: str, commit_type: Optional[str]) -> str:
     """Generate a commit message using AI."""
-    prompt = _build_commit_prompt(changes, commit_type, language=config.user.language)
+    prompt = _build_commit_prompt(changes, language=config.user.language, commit_type=commit_type)
 
     client = get_ai_client()
     response = client.generate(
@@ -62,7 +63,10 @@ def _generate_message(changes: str, commit_type: Optional[str]) -> str:
 
     return response.strip()
 
-def _build_commit_prompt(changes: str, language: str = "en", commit_type: Optional[str] = None) -> str:
+
+def _build_commit_prompt(
+    changes: str, language: str = "en", commit_type: Optional[str] = None
+) -> str:
     """Build the prompt for commit message generation."""
     language_prompt = "" if language == "en" else f"Please respond in {language} language.\n\n"
 
@@ -72,7 +76,6 @@ def _build_commit_prompt(changes: str, language: str = "en", commit_type: Option
     - Use the imperative mood ("Add feature" not "Added feature")
     - First line should be a short summary (50 chars or less)
     - If needed, add a detailed description after a blank line
-    - Reference any relevant issue numbers if found in the diff
     - Be specific about what changed and why
     - Focus on the intention of the change, not just what files changed
     """
@@ -89,11 +92,13 @@ def _build_commit_prompt(changes: str, language: str = "en", commit_type: Option
 
     return f"{base_prompt}\n\nChanges:\n{changes}"
 
+
 def _edit_message(message: str) -> str:
     """Open the default editor to edit the commit message."""
-    with click.edit(message) as edited:
-        return edited if edited is not None else message
+    edited = click.edit(message)
+    return edited if edited is not None else message
+
 
 def _commit_changes(message: str) -> None:
     """Commit the changes with the given message."""
-    subprocess.run(['git', 'commit', '-m', message], check=True)
+    subprocess.run(["git", "commit", "-m", message], check=True)

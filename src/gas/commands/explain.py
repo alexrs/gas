@@ -9,6 +9,7 @@ from gas.core.config import config
 
 console = Console()
 
+
 def explain_diff(diff_content: str, detailed: bool = False) -> None:
     """Explain the Git diff using AI.
 
@@ -21,7 +22,7 @@ def explain_diff(diff_content: str, detailed: bool = False) -> None:
         return
 
     # Parse the git diff to get structured changes
-    with Status("[bold blue]📝 Analyzing changes...", spinner="dots") as status:
+    with Status("[bold blue]📝 Analyzing changes...", spinner="dots"):
         changes = parse_git_diff(diff_content)
 
         # Prepare the prompt for the AI
@@ -37,24 +38,22 @@ def explain_diff(diff_content: str, detailed: bool = False) -> None:
         )
 
         # Display the explanation
-        console.print(Panel(
-            response,
-            title="[bold green]✨ Changes Explained[/bold green]",
-            border_style="green"
-        ))
+        console.print(
+            Panel(
+                response,
+                title="[bold green]✨ Changes Explained[/bold green]",
+                border_style="green",
+            )
+        )
     except Exception as e:
         console.print(f"[red]❌ Error explaining changes: {str(e)}[/red]")
 
-def _build_explanation_prompt(
-    changes: str,
-    detailed: bool = False,
-    language: str = "en"
-) -> str:
+
+def _build_explanation_prompt(changes: str, detailed: bool = False, language: str = "en") -> str:
     """Build an AI prompt for explaining Git diffs."""
     # Language instruction for non-English responses
     language_instruction = (
-        "" if language.lower().startswith("en")
-        else f"Please respond in {language}."
+        "" if language.lower().startswith("en") else f"Please respond in {language}."
     )
 
     # Core instruction for the AI
@@ -84,5 +83,7 @@ def _build_explanation_prompt(
         """)
 
     # Assemble final prompt
-    prompt = f"{core_instruction.strip()}\n{detailed_section.strip()}\n\nGit diff:\n{changes.strip()}"
+    prompt = (
+        f"{core_instruction.strip()}\n{detailed_section.strip()}\n\nGit diff:\n{changes.strip()}"
+    )
     return prompt

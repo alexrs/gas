@@ -1,6 +1,7 @@
 import subprocess
 from typing import Optional
 
+
 def parse_git_diff(diff_content: str) -> str:
     """Parse the git diff content into a structured format.
 
@@ -14,6 +15,7 @@ def parse_git_diff(diff_content: str) -> str:
     # In the future, we can parse this into a more structured format
     return diff_content.strip()
 
+
 def get_staged_changes() -> Optional[str]:
     """Get the staged changes in the repository.
 
@@ -22,40 +24,35 @@ def get_staged_changes() -> Optional[str]:
     """
     try:
         result = subprocess.run(
-            ['git', 'diff', '--cached'],
-            capture_output=True,
-            text=True,
-            check=True
+            ["git", "diff", "--cached"], capture_output=True, text=True, check=True
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError:
         return None
 
+
 def get_current_branch() -> str:
     """Get the name of the current branch."""
     try:
         result = subprocess.run(
-            ['git', 'branch', '--show-current'],
-            capture_output=True,
-            text=True,
-            check=True
+            ["git", "branch", "--show-current"], capture_output=True, text=True, check=True
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError:
-        return 'unknown'
+        return "unknown"
+
 
 def is_git_repository() -> bool:
     """Check if the current directory is a git repository."""
     try:
         subprocess.run(
-            ['git', 'rev-parse', '--is-inside-work-tree'],
-            capture_output=True,
-            check=True
+            ["git", "rev-parse", "--is-inside-work-tree"], capture_output=True, check=True
         )
         return True
     except subprocess.CalledProcessError:
         return False
 
+
 def get_git_diff() -> str:
     """Get the git diff for the current branch."""
-    return subprocess.check_output(['git', 'diff']).decode('utf-8')
+    return subprocess.check_output(["git", "diff"]).decode("utf-8")

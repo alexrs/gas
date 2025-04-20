@@ -1,6 +1,6 @@
 from gas.commands.explain import _build_explanation_prompt
 from gas.commands.commit import _build_commit_prompt
-from gas.core.config import Config
+
 
 def test_explanation_prompt_english():
     """Test explanation prompt in English."""
@@ -17,6 +17,7 @@ def test_explanation_prompt_english():
     assert "you are an expert git assistant." in prompt.lower()
     assert "language prompt" not in prompt.lower()  # No language prompt for English
 
+
 def test_explanation_prompt_spanish():
     """Test explanation prompt in Spanish."""
     diff = """diff --git a/src/main.py b/src/main.py
@@ -30,6 +31,7 @@ def test_explanation_prompt_spanish():
     assert "es" in prompt.lower()
     assert diff in prompt
 
+
 def test_explanation_prompt_detailed():
     """Test detailed explanation prompt."""
     diff = "sample diff"
@@ -39,6 +41,7 @@ def test_explanation_prompt_detailed():
 
     assert len(prompt_detailed) > len(prompt_simple)
     assert "detailed" in prompt_detailed.lower()
+
 
 def test_commit_prompt_english():
     """Test commit message prompt in English."""
@@ -54,6 +57,7 @@ def test_commit_prompt_english():
     assert "generate a clear and concise commit message" in prompt.lower()
     assert "language prompt" not in prompt.lower()  # No language prompt for English
 
+
 def test_commit_prompt_french():
     """Test commit message prompt in French."""
 
@@ -67,6 +71,7 @@ def test_commit_prompt_french():
     prompt = _build_commit_prompt(diff, language="fr")
     assert "fr" in prompt.lower()
     assert diff in prompt
+
 
 def test_commit_prompt_conventional():
     """Test conventional commit message prompt."""

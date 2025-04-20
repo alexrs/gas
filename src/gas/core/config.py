@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 
@@ -7,46 +6,38 @@ from pydantic import BaseModel, Field
 
 # Configuration paths in order of precedence (highest to lowest)
 CONFIG_PATHS = {
-    'local': Path('.gas.yaml'),  # Local repository config
-    'global': Path.home() / '.config' / 'gas' / 'config.yml',  # Global user config
+    "local": Path(".gas.yaml"),  # Local repository config
+    "global": Path.home() / ".config" / "gas" / "config.yml",  # Global user config
 }
+
 
 class AIConfig(BaseModel):
     """AI-related configuration."""
+
     model: str = Field(
-        default="CohereLabs/c4ai-command-a-03-2025",
-        description="The model to use for generation"
+        default="CohereLabs/c4ai-command-a-03-2025", description="The model to use for generation"
     )
     temperature: float = Field(
-        default=0.7,
-        ge=0.0,
-        le=1.0,
-        description="Temperature for generation (0.0 to 1.0)"
+        default=0.7, ge=0.0, le=1.0, description="Temperature for generation (0.0 to 1.0)"
     )
-    max_tokens: int = Field(
-        default=500,
-        gt=0,
-        description="Maximum number of tokens to generate"
-    )
+    max_tokens: int = Field(default=500, gt=0, description="Maximum number of tokens to generate")
+
 
 class UserConfig(BaseModel):
     """User preferences configuration."""
-    language: str = Field(
-        default="en",
-        description="Language for explanations (ISO 639-1 code)"
-    )
-    emoji_enabled: bool = Field(
-        default=True,
-        description="Whether to show emojis in output"
-    )
+
+    language: str = Field(default="en", description="Language for explanations (ISO 639-1 code)")
+    emoji_enabled: bool = Field(default=True, description="Whether to show emojis in output")
+
 
 class Config(BaseModel):
     """Main configuration class."""
+
     ai: AIConfig = Field(default_factory=AIConfig)
     user: UserConfig = Field(default_factory=UserConfig)
 
     @classmethod
-    def load(cls) -> 'Config':
+    def load(cls) -> "Config":
         """Load configuration from all sources and merge them.
 
         The local config takes precedence over the global config.
@@ -54,12 +45,12 @@ class Config(BaseModel):
         config_dict = {}
 
         # Load global config first (if exists)
-        global_config = cls._load_file(CONFIG_PATHS['global'])
+        global_config = cls._load_file(CONFIG_PATHS["global"])
         if global_config:
             config_dict.update(global_config)
 
         # Load local config and override global settings
-        local_config = cls._load_file(CONFIG_PATHS['local'])
+        local_config = cls._load_file(CONFIG_PATHS["local"])
         if local_config:
             config_dict.update(local_config)
 
@@ -69,18 +60,20 @@ class Config(BaseModel):
     def _load_file(path: Path) -> Optional[Dict[str, Any]]:
         """Load a single configuration file."""
         if path.exists():
-            with open(path, 'r') as f:
+            with open(path, "r") as f:
                 return yaml.safe_load(f) or {}
         return None
 
-    def save(self, scope: str = 'local') -> None:
+    def save(self, scope: str = "local") -> None:
         """Save configuration to file.
 
         Args:
             scope: Where to save the config ('local' or 'global')
         """
         if scope not in CONFIG_PATHS:
-            raise ValueError(f"Invalid scope: {scope}. Must be one of: {', '.join(CONFIG_PATHS.keys())}")
+            raise ValueError(
+                f"Invalid scope: {scope}. Must be one of: {', '.join(CONFIG_PATHS.keys())}"
+            )
 
         config_path = CONFIG_PATHS[scope]
 
@@ -88,10 +81,10 @@ class Config(BaseModel):
         config_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Save config
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             yaml.dump(self.model_dump(), f, default_flow_style=False)
 
-    def set_value(self, key_path: str, value: Any, scope: str = 'local') -> None:
+    def set_value(self, key_path: str, value: Any, scope: str = "local") -> None:
         """Set a configuration value by its dot-notation path.
 
         Args:
@@ -100,7 +93,7 @@ class Config(BaseModel):
             scope: Where to save the change ('local' or 'global')
         """
         # Split the path into parts
-        parts = key_path.split('.')
+        parts = key_path.split(".")
 
         # Validate the path exists in our schema
         current = self.model_dump()
@@ -115,7 +108,7 @@ class Config(BaseModel):
         # Load existing config for the specified scope
         config_path = CONFIG_PATHS[scope]
         if config_path.exists():
-            with open(config_path, 'r') as f:
+            with open(config_path, "r") as f:
                 config_dict = yaml.safe_load(f) or {}
         else:
             config_dict = {}
@@ -130,7 +123,7 @@ class Config(BaseModel):
 
         # Save the updated config
         config_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             yaml.dump(config_dict, f, default_flow_style=False)
 
         # Reload the configuration
@@ -140,7 +133,7 @@ class Config(BaseModel):
     def get_value(self, key_path: str) -> Any:
         """Get a configuration value by its dot-notation path."""
         current = self.model_dump()
-        for part in key_path.split('.'):
+        for part in key_path.split("."):
             if part not in current:
                 raise ValueError(f"Invalid config path: {key_path}")
             current = current[part]
@@ -151,7 +144,7 @@ class Config(BaseModel):
         """List all available configuration options with their descriptions."""
         options = []
 
-        def extract_fields(model_class: type[BaseModel], prefix: str = ''):
+        def extract_fields(model_class: type[BaseModel], prefix: str = ""):
             for field_name, field in model_class.model_fields.items():
                 full_path = f"{prefix}.{field_name}" if prefix else field_name
 
@@ -168,15 +161,18 @@ class Config(BaseModel):
                     else:
                         default_value = field.default
 
-                    options.append({
-                        'path': full_path,
-                        'description': field.description or '',
-                        'default': str(default_value),
-                    })
+                    options.append(
+                        {
+                            "path": full_path,
+                            "description": field.description or "",
+                            "default": str(default_value),
+                        }
+                    )
 
         # Start with the main config class
         extract_fields(cls)
         return options
+
 
 # Global configuration instance
 config = Config.load()

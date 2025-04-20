@@ -14,6 +14,7 @@ from gas.core.config import config
 load_dotenv()
 console = Console()
 
+
 class AIClient:
     def __init__(self, api_key: Optional[str] = None, max_retries: int = 3):
         """Initialize the AI client with Hugging Face Inference API.
@@ -30,10 +31,7 @@ class AIClient:
         self.max_retries = max_retries
 
     def generate(
-        self,
-        prompt: str,
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None
+        self, prompt: str, max_tokens: Optional[int] = None, temperature: Optional[float] = None
     ) -> str:
         """Generate text using the AI model with retry logic.
 
@@ -61,7 +59,9 @@ class AIClient:
         with Status(f"[bold yellow]{thinking_emoji} Thinking...", spinner="dots") as status:
             for attempt in range(self.max_retries):
                 try:
-                    status.update(f"[bold yellow]{thinking_emoji} Thinking... (Attempt {attempt + 1}/{self.max_retries})")
+                    status.update(
+                        f"[bold yellow]{thinking_emoji} Thinking... (Attempt {attempt + 1}/{self.max_retries})"
+                    )
 
                     # Add language preference to prompt if not English
                     if config.user.language != "en":
@@ -78,32 +78,37 @@ class AIClient:
                 except Exception as e:
                     last_error = e
                     if attempt < self.max_retries - 1:
-                        wait_time = 1.5 ** attempt  # Exponential backoff
-                        status.update(f"[yellow]{retry_emoji} Retrying... ({attempt + 1}/{self.max_retries}): {str(e)}")
+                        wait_time = 1.5**attempt  # Exponential backoff
+                        status.update(
+                            f"[yellow]{retry_emoji} Retrying... ({attempt + 1}/{self.max_retries}): {str(e)}"
+                        )
                         time.sleep(wait_time)
                     else:
                         status.update(f"[red]{error_emoji} Failed to generate response")
                         console.print(f"[red]Max retries reached. Last error: {str(e)}[/red]")
 
-        raise ValueError(f"Failed to generate response after {self.max_retries} attempts: {str(last_error)}")
+        raise ValueError(
+            f"Failed to generate response after {self.max_retries} attempts: {str(last_error)}"
+        )
 
     def _extract_json(self, text: str) -> Dict:
         """Extract JSON from potentially messy LLM output."""
         # Try to find JSON in code blocks
-        match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', text, re.DOTALL)
+        match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
         if match:
             return json.loads(match.group(1))
 
         # Try to find raw JSON
-        match = re.search(r'\{.*\}', text, re.DOTALL)
+        match = re.search(r"\{.*\}", text, re.DOTALL)
         if match:
             return json.loads(match.group(0))
 
         raise ValueError("Could not extract valid JSON from response")
 
+
 def _get_api_key() -> str:
     """Get the Hugging Face API key from environment variables."""
-    api_key = os.getenv('HUGGINGFACE_API_KEY')
+    api_key = os.getenv("HUGGINGFACE_API_KEY")
 
     if not api_key:
         console.print("[red]Error: HUGGINGFACE_API_KEY environment variable not set[/red]")
@@ -114,6 +119,7 @@ def _get_api_key() -> str:
         raise ValueError("HUGGINGFACE_API_KEY not set")
 
     return api_key
+
 
 def get_ai_client(api_key: Optional[str] = None, max_retries: int = 3) -> AIClient:
     """Get an instance of the AI client."""
